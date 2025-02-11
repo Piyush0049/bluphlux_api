@@ -9,27 +9,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = [
-    "https://bluphlux-ui.vercel.app", 
+
+let allowedOrigins: string[];
+allowedOrigins = [
+    "https://bluphlux-ui.vercel.app",
     "http://localhost:5173"
 ];
 
-const corsOptions = {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+app.use(cors({
+    origin: (origin, callback) => {
+        console.log("Request Origin:", origin);
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error("Not allowed by CORS"));
+            callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
-    optionsSuccessStatus: 200,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-};
+}));
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 
 app.post("/sendemail", async (req: Request, res: Response) => {
