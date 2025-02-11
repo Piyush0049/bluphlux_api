@@ -8,23 +8,29 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const allowedOrigins = [
+    "https://bluphlux-ui.vercel.app", 
+    "http://localhost:5173"
+];
+
 const corsOptions = {
-    origin: (origin: any, callback: any) => {
-        const allowedOrigins = [
-            "https://bluphlux-ui.vercel.app", "http://localhost:5173/",
-        ];
-        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            callback(new Error("Not allowed by CORS"));
         }
     },
-    optionsSuccessStatus: 200,
     credentials: true,
+    optionsSuccessStatus: 200,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.options("*", cors(corsOptions));
+
 
 app.post("/sendemail", async (req: Request, res: Response) => {
     const { recipientName, interviewDate, interviewTime, recEmail } = req.body;
