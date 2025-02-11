@@ -1,4 +1,3 @@
-// src/server.ts
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -9,9 +8,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-let allowedOrigins: string[];
-allowedOrigins = [
+const allowedOrigins: string[] = [
     "https://bluphlux-ui.vercel.app",
     "http://localhost:5173"
 ];
@@ -22,16 +22,19 @@ app.use(cors({
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            callback(new Error("Not allowed by CORS"));
         }
     },
     credentials: true,
 }));
 
-
-
 app.post("/sendemail", async (req: Request, res: Response) => {
+    console.log("Request Received:");
+    console.log("Headers:", req.headers);
+    console.log("Body:", req.body);
+
     const { recipientName, interviewDate, interviewTime, recEmail } = req.body;
+
     try {
         const templateParams = {
             recipientName,
